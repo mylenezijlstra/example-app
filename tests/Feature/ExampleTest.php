@@ -17,5 +17,23 @@ class ExampleTest extends TestCase
         $response = $this->get('/');
 
         $response->assertStatus(200);
+        $response->assertSee('Laravel From Scratch');
+        $response->assertSee('/post');
+    }
+
+    public function test_the_detail_post_page_loads()
+    {
+        $response = $this->get('/post');
+
+        $response->assertStatus(200);
+        $response->assertSee('Back to Posts');
+    }
+
+    public function test_the_detail_post_page_loads_with_slug()
+    {
+        $response = $this->get('/posts/my-first-post');
+
+        $response->assertStatus(200);
+        $response->assertSee('Back to Posts');
     }
 }
