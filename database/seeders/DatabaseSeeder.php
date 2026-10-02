@@ -122,5 +122,60 @@ class DatabaseSeeder extends Seeder
             'body' => '<p>The PHP and Laravel ecosystems have matured into one of the most powerful and enjoyable web development platforms available today.</p><p>With tools like Artisan, Vite, Blade components, and seamless database integration, you have everything needed to build state-of-the-art web products quickly and efficiently.</p>',
             'published_at' => now()->subDays(6),
         ]);
+
+        Post::create([
+            'user_id' => $jeffrey->id,
+            'category_id' => $techniques->id,
+            'title' => 'Advanced Query Scopes in Eloquent for Dynamic Filtering',
+            'slug' => 'advanced-query-scopes-in-eloquent',
+            'thumbnail' => 'images/illustration-1.png',
+            'excerpt' => '<p>Master query scopes in Laravel to keep your controllers clean and your business logic DRY when filtering large datasets.</p>',
+            'body' => '<p>Query scopes allow you to define common sets of query constraints that you can easily re-use throughout your application. For example, you may need to frequently retrieve all posts that are popular or in a specific category.</p>',
+            'published_at' => now()->subDays(7),
+        ]);
+
+        Post::create([
+            'user_id' => $lary->id,
+            'category_id' => $business->id,
+            'title' => 'Deploying High-Traffic Laravel Applications into Production',
+            'slug' => 'deploying-high-traffic-laravel-applications',
+            'thumbnail' => 'images/illustration-2.png',
+            'excerpt' => '<p>A guide to configuring server queues, OPcache, MySQL optimization, and CDN assets for smooth scaling.</p>',
+            'body' => '<p>Production readiness requires attention to caching, session drivers, and database indexing. Discover how to configure your servers for maximum throughput and reliability.</p>',
+            'published_at' => now()->subDays(8),
+        ]);
+
+        Post::create([
+            'user_id' => $jeffrey->id,
+            'category_id' => $personal->id,
+            'title' => 'My Favorite Web Development Tools and Productivity Hacks',
+            'slug' => 'my-favorite-web-development-tools',
+            'thumbnail' => 'images/illustration-3.png',
+            'excerpt' => '<p>A curated list of IDE shortcuts, terminal tools, and productivity workflows that speed up daily coding.</p>',
+            'body' => '<p>Staying productive as a developer means mastering your tools. From custom shell aliases to git workflow optimizations, small adjustments create massive compounding speedups.</p>',
+            'published_at' => now()->subDays(9),
+        ]);
+
+        Post::create([
+            'user_id' => $lary->id,
+            'category_id' => $updates->id,
+            'title' => 'New Features in Laravel Blade Components and Directives',
+            'slug' => 'new-features-in-laravel-blade-components',
+            'thumbnail' => 'images/illustration-4.png',
+            'excerpt' => '<p>Explore how anonymous components, slots, and attribute merging make Blade the most expressive templating engine in PHP.</p>',
+            'body' => '<p>Blade components provide a component-driven approach similar to front-end frameworks like React or Vue, but rendered server-side with zero build overhead.</p>',
+            'published_at' => now()->subDays(10),
+        ]);
+
+        Post::create([
+            'user_id' => $jeffrey->id,
+            'category_id' => $techniques->id,
+            'title' => 'Seamless Pagination and Query Strings in Laravel',
+            'slug' => 'seamless-pagination-and-query-strings',
+            'thumbnail' => 'images/illustration-5.png',
+            'excerpt' => '<p>Learn why withQueryString() is crucial when building paginated filters in modern web applications.</p>',
+            'body' => '<p>When filtering datasets across multiple pages, retaining query parameters like category, author, and search terms is essential for user experience.</p>',
+            'published_at' => now()->subDays(11),
+        ]);
     }
 }

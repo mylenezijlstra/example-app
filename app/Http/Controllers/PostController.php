@@ -23,18 +23,22 @@ class PostController extends Controller
     }
 
     /**
-     * Display the blog posts overview homepage.
+     * Display the blog posts overview homepage with filters and pagination.
      */
     public function index(Request $request): View
     {
-        $filters = $request->only(['search', 'category', 'author']);
+        $filters = $request->only(['search', 'category', 'author', 'sort']);
         $posts = $this->postService->getFilteredPosts($filters);
         $categories = $this->postService->getCategories();
+        $authors = $this->postService->getAuthors();
 
         return view('posts.index', [
             'posts' => $posts,
             'categories' => $categories,
-            'currentCategory' => $request->get('category'),
+            'authors' => $authors,
+            'currentCategory' => $request->query('category'),
+            'currentAuthor' => $request->query('author'),
+            'currentSort' => $request->query('sort'),
         ]);
     }
 

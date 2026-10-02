@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Category;
 use App\Models\Post;
+use App\Models\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 
@@ -18,20 +20,22 @@ class PostService
     protected const CACHE_TTL = 600;
 
     /**
-     * Retrieve all posts matching the provided filters, utilizing Cache.
+     * Retrieve all posts matching the provided filters with pagination, utilizing Cache.
      *
      * @param array $filters
-     * @return Collection
+     * @param int $perPage
+     * @return LengthAwarePaginator
      */
-    public function getFilteredPosts(array $filters = []): Collection
+    public function getFilteredPosts(array $filters = [], int $perPage = 6): LengthAwarePaginator
     {
-        $cacheKey = 'posts.' . md5(serialize($filters));
+        $page = request()->query('page', 1);
+        $cacheKey = 'posts.' . md5(serialize($filters) . ".page.{$page}");
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($filters) {
-            return Post::latest('published_at')
-                ->filter($filters)
+        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($filters, $perPage) {
+            return Post::filter($filters)
                 ->with(['category', 'author'])
-                ->get();
+                ->paginate($perPage)
+                ->withQueryString();
         });
     }
 
@@ -65,11 +69,22 @@ class PostService
     }
 
     /**
-     * Clear all post and category caches.
+     * Retrieve all authors for filters, utilizing Cache.
+     *
+     * @return Collection
+     */
+    public function getAuthors(): Collection
+    {
+        return Cache::remember('authors.all', self::CACHE_TTL, function () {
+            return User::all();
+        });
+    }
+
+    /**
+     * Clear all post, category, and author caches.
      */
     public function clearCache(): void
     {
-        Cache::forget('categories.all');
-        Cache::forget('posts.all');
+        Cache::flush();
     }
 }

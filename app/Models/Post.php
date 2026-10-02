@@ -64,6 +64,16 @@ class Post extends Model
                 $query->where('username', $author)
             );
         });
+
+        $query->when($filters['sort'] ?? false, function ($query, $sort) {
+            if ($sort === 'oldest') {
+                $query->oldest('published_at');
+            } else {
+                $query->latest('published_at');
+            }
+        }, function ($query) {
+            $query->latest('published_at');
+        });
     }
 
     /**

@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Category;
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
@@ -50,16 +52,45 @@ class ExampleTest extends TestCase
      */
     public function test_can_filter_posts_by_category()
     {
-        $post = Post::first();
+        $category = Category::where('slug', 'techniques')->first();
+        $matchingPost = Post::where('category_id', $category->id)->first();
 
-        $response = $this->get('/?category=' . $post->category->slug);
+        $response = $this->get('/?category=' . $category->slug);
 
         $response->assertStatus(200);
-        $response->assertSee($post->title);
+        $response->assertSee($matchingPost->title);
+        $response->assertSee('selected');
     }
 
     /**
-     * Test that caching operates on post retrieval.
+     * Test filtering posts by author in "Other Filters".
+     */
+    public function test_can_filter_posts_by_author()
+    {
+        $author = User::where('username', 'lary-laracore')->first();
+        $matchingPost = Post::where('user_id', $author->id)->first();
+
+        $response = $this->get('/?author=' . $author->username);
+
+        $response->assertStatus(200);
+        $response->assertSee($matchingPost->title);
+        $response->assertSee('selected');
+    }
+
+    /**
+     * Test pagination preserves query string across pages.
+     */
+    public function test_pagination_preserves_query_string()
+    {
+        $response = $this->get('/?category=techniques&page=1');
+
+        $response->assertStatus(200);
+        // Pagination links contain category query string
+        $response->assertSee('category=techniques');
+    }
+
+    /**
+     * Test that caching operates on post retrieval with pagination.
      */
     public function test_posts_are_cached()
     {
@@ -67,7 +98,7 @@ class ExampleTest extends TestCase
 
         $this->get('/');
 
-        $cacheKey = 'posts.' . md5(serialize([]));
+        $cacheKey = 'posts.' . md5(serialize([]) . '.page.1');
         $this->assertTrue(Cache::has($cacheKey));
     }
 }
