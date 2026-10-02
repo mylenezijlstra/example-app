@@ -85,8 +85,60 @@ class ExampleTest extends TestCase
         $response = $this->get('/?category=techniques&page=1');
 
         $response->assertStatus(200);
-        // Pagination links contain category query string
         $response->assertSee('category=techniques');
+    }
+
+    /**
+     * Test that searching by title returns matching posts.
+     */
+    public function test_can_search_posts_by_title()
+    {
+        $response = $this->get('/?search=Scalable');
+
+        $response->assertStatus(200);
+        $response->assertSee('Scalable');
+        $response->assertSee('value="Scalable"', false);
+    }
+
+    /**
+     * Test that searching by body text returns matching posts.
+     */
+    public function test_can_search_posts_by_body()
+    {
+        $response = $this->get('/?search=SOLID');
+
+        $response->assertStatus(200);
+        $response->assertSee('Building');
+        $response->assertSee('OOP');
+    }
+
+    /**
+     * Test that search works together with category filter without leaking across filters.
+     */
+    public function test_search_and_category_filter_work_together()
+    {
+        // "Scalable" is in business category
+        $response = $this->get('/?category=business&search=Scalable');
+        $response->assertStatus(200);
+        $response->assertSee('Scalable');
+
+        // Searching for "Scalable" in personal category should return no results
+        $responseMismatched = $this->get('/?category=personal&search=Scalable');
+        $responseMismatched->assertStatus(200);
+        $responseMismatched->assertSee('Geen resultaten gevonden voor', false);
+    }
+
+    /**
+     * Test clear message when zero results are found.
+     */
+    public function test_empty_search_shows_clear_message()
+    {
+        $response = $this->get('/?search=nonexistentkeywordxyz');
+
+        $response->assertStatus(200);
+        $response->assertSee('Geen resultaten gevonden voor', false);
+        $response->assertSee('nonexistentkeywordxyz', false);
+        $response->assertSee('value="nonexistentkeywordxyz"', false);
     }
 
     /**

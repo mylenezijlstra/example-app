@@ -12,7 +12,7 @@
             I'm going to keep you guys up to speed with what's going on!
         </p>
 
-        <form method="GET" action="/" class="space-y-2 lg:space-y-0 lg:space-x-4 mt-8 flex flex-col lg:flex-row items-center justify-center">
+        <form id="filter-form" method="GET" action="/" class="space-y-2 lg:space-y-0 lg:space-x-4 mt-8 flex flex-col lg:flex-row items-center justify-center">
             <!-- Category Filter -->
             <div class="relative flex lg:inline-flex items-center bg-gray-100 rounded-xl w-full lg:w-auto">
                 <select name="category" onchange="this.form.submit()" class="flex-1 appearance-none bg-transparent py-2 pl-3 pr-9 text-sm font-semibold">
@@ -55,12 +55,14 @@
                 </svg>
             </div>
 
-            <!-- Search -->
+            <!-- Search input -->
             <div class="relative flex lg:inline-flex items-center bg-gray-100 rounded-xl px-3 py-2 w-full lg:w-auto">
-                <input type="text"
+                <input id="search-input"
+                       type="text"
                        name="search"
                        placeholder="Find something"
                        value="{{ request('search') }}"
+                       autocomplete="off"
                        class="bg-transparent placeholder-black font-semibold text-sm focus:outline-none">
             </div>
 
@@ -86,12 +88,47 @@
                 {{ $posts->links() }}
             </div>
         @else
-            <div class="text-center py-12">
-                <p class="text-gray-500 text-lg">Geen artikelen gevonden voor de gekozen filters.</p>
-                <div class="mt-4">
-                    <a href="/" class="text-blue-500 hover:underline text-sm font-semibold">Wis filters en toon alles</a>
+            <div class="text-center py-16 bg-gray-50 rounded-2xl border border-gray-100 px-6">
+                <svg class="mx-auto h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                @if (request('search'))
+                    <p class="text-gray-600 text-lg">Geen resultaten gevonden voor <span class="font-semibold text-gray-900">"{{ request('search') }}"</span>.</p>
+                @else
+                    <p class="text-gray-600 text-lg">Geen artikelen gevonden voor de gekozen filters.</p>
+                @endif
+                <p class="text-gray-400 text-sm mt-1">Probeer een andere zoekterm of wis je filters om alle artikelen te zien.</p>
+                <div class="mt-5">
+                    <a href="/" class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-xs font-semibold uppercase tracking-wider transition-colors">
+                        Wis filters en toon alles
+                    </a>
                 </div>
             </div>
         @endif
     </main>
+
+    {{-- Live debounced search --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const input = document.getElementById('search-input');
+            let timer;
+
+            if (input) {
+                // Focus and move cursor to end if user was typing
+                if (input.value) {
+                    input.focus();
+                    const val = input.value;
+                    input.value = '';
+                    input.value = val;
+                }
+
+                input.addEventListener('input', function () {
+                    clearTimeout(timer);
+                    timer = setTimeout(() => {
+                        document.getElementById('filter-form').submit();
+                    }, 500);
+                });
+            }
+        });
+    </script>
 </x-layout>
